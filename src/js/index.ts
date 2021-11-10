@@ -9,8 +9,8 @@ class CardStack {
 
   expand = () => {
     this.isExpanded = true
-    this.cards.forEach((card, index) => {
-      card.moveToPosition(index * 12 - 25, 0)
+    this.cards.forEach((card) => {
+      card.expand()
     })
   }
 
@@ -45,7 +45,7 @@ class Card {
 
   private applyTransform = () => {
     const { x, y, rotation } = this.transform
-    this.element.style.transform = `translateX(${x}vw) translateY(${y}vw) rotateZ(${rotation}deg) rotateY(${
+    this.element.style.transform = `translateX(${x}rem) translateY(${y}rem) rotateZ(${rotation}deg) rotateY(${
       this.isRotated ? '180deg' : '0deg'
     })`
   }
@@ -54,32 +54,37 @@ class Card {
     if (!this.cardStack.isExpanded) {
       this.cardStack.expand()
     } else {
-      this.isRotated = !this.isRotated
-      this.applyTransform()
-
       if (this.isRotated) {
-        this.element.classList.add('card--rotated')
-        this.cardStack.returnOtherCards(this)
+        this.hideFrontSide()
       } else {
-        this.element.classList.remove('card--rotated')
+        this.showFrontSide()
       }
     }
   }
 
+  expand = () => {
+    this.element.classList.add('card--placed')
+    this.element.style.transform = ''
+  }
+
+  showFrontSide = () => {
+    this.element.classList.add('card--rotated')
+    this.element.classList.remove('card--hidden')
+    this.isRotated = true
+    this.cardStack.returnOtherCards(this)
+  }
+
   hideFrontSide = () => {
-    this.element.classList.remove('card--rotated')
-    this.isRotated = false
-    this.applyTransform()
+    if (this.isRotated) {
+      this.element.classList.add('card--hidden')
+      this.element.classList.remove('card--rotated')
+      this.isRotated = false
+    }
   }
 
   returnToStack = () => {
     const [x, y, rotation] = this.randomSeed
     this.transform = { x, y, rotation }
-    this.applyTransform()
-  }
-
-  moveToPosition = (x: number, y: number) => {
-    this.transform = { ...this.transform, x, y, rotation: 0 }
     this.applyTransform()
   }
 }

@@ -8,53 +8,165 @@ body {
 }
 
 html {
-  font-size: 62.5%;
+  font-size: 2vw;
+
+  --card-border-radius: 1rem;
+
+  @media (orientation: landscape) {
+    font-size: 1.4vw;
+  }
+
+  @media (min-aspect-ratio: 7/2) {
+    font-size: 4vh;
+  }
 }
 
 body {
-  font-size: 1.6rem;
-  perspective: 50vw;
-  perspective-origin: 50% 50%;
+  font-size: 0.6rem;
+  perspective: 50rem;
+  perspective-origin: 50% 75%;
   transform-style: preserve-3d;
+  background: url('../../img/bg-landscape.jpg') center center/cover no-repeat;
+
+  @media (orientation: portrait) {
+    background-image: url('../../img/bg-portrait.jpg');
+  }
+}
+
+@keyframes rotateCardIn {
+  33% {
+    transform: translateZ(5rem);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0);
+  }
+  66% {
+    transform: translateZ(5rem) rotateY(180deg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0);
+  }
+  to {
+    transform: rotateY(180deg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes rotateCardOut {
+  from {
+    transform: rotateY(180deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes animateShadowIn {
+  from {
+    opacity: 0.2;
+  }
+  33% {
+    transform: scale(110%);
+    filter: blur(0.5rem);
+  }
+  66% {
+    transform: scale(110%) rotateY(180deg);
+    filter: blur(0.5rem);
+  }
+  to {
+    transform: rotateY(180deg);
+    filter: none;
+    opacity: 0.2;
+  }
 }
 
 .card {
   position: absolute;
-  top: calc(50% - 7.5vw);
-  left: calc(50% - 5vw);
-  width: 10vw;
-  height: 15vw;
-  cursor: pointer;
+  top: calc(50% - 7.5rem);
+  left: calc(50% - 5rem);
+  width: 10rem;
+  height: 15rem;
+  transition: transform 0.5s;
   transform-style: preserve-3d;
-  transition: filter 0.2s, transform 0.5s;
-  border-radius: 1vw;
-  box-shadow: 0 0.1vw 0.1vw rgba(0, 0, 0, 0.2);
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    border-radius: 1vw;
-    border: 0.5vw solid #bbb;
-    backface-visibility: hidden;
-    background-color: #ccc;
-  }
+  counter-increment: card-counter;
 
   &::after {
     content: '';
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
-    border-radius: 1vw;
-    transition: 0.25s opacity 0.25s;
+    border-radius: var(--card-border-radius);
     opacity: 0;
-    backface-visibility: hidden;
-    background-color: black;
+    background: black;
+    z-index: -1;
+  }
+
+  &__inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    border-radius: var(--card-border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    &::before {
+      content: counter(card-counter);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      border-radius: var(--card-border-radius);
+      font-weight: bold;
+      color: #f3f2ee;
+      -webkit-text-stroke: 1.5px #b09456;
+      font-size: 5rem;
+      backface-visibility: hidden;
+      background: linear-gradient(to top, #b0945610, #f3f2ee00, #ffffff30),
+        url('../../img/card.jpg') center center/cover no-repeat;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      border-radius: var(--card-border-radius);
+      transition: 0.25s opacity 0.25s;
+      opacity: 0;
+      pointer-events: none;
+      backface-visibility: hidden;
+      background-color: black;
+    }
+  }
+
+  &__content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    padding: 0 1em;
+    margin: var(--card-border-radius) 0;
+    overflow-y: auto;
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      border-radius: 0.2rem;
+    }
   }
 
   &__front {
@@ -65,8 +177,8 @@ body {
     height: 100%;
     backface-visibility: hidden;
     transform: rotateY(180deg);
-    border-radius: 1vw;
-    background-color: #ccc;
+    border-radius: var(--card-border-radius);
+    background: #f3f2ee linear-gradient(to top, #b0945610, #f3f2ee00, #ffffff10);
 
     &::after {
       content: '';
@@ -77,17 +189,56 @@ body {
       height: 100%;
       transition: 0.25s opacity;
       opacity: 0.5;
+      pointer-events: none;
       background-color: white;
     }
   }
 
-  &--rotated .card__front::after {
-    transition: 0.25s opacity 0.25s;
-    opacity: 0;
+  &--rotated .card__inner {
+    animation: 1.5s rotateCardIn forwards;
+  }
+
+  &--hidden .card__inner {
+    animation: 0.5s rotateCardOut forwards;
   }
 
   &--rotated::after {
-    transition: 0.25s opacity;
+    animation: 1.5s animateShadowIn;
+  }
+
+  &--rotated .card__front::after {
+    transition: 0.25s opacity 0.7s;
+    opacity: 0;
+  }
+
+  &--rotated .card__inner::after {
+    transition: 0.25s opacity 0.5s;
     opacity: 0.2;
+  }
+
+  @for $i from 1 through 5 {
+    &--placed {
+      &:nth-child(#{$i}) {
+        transform: translateX(-33 + $i * 11rem);
+      }
+    }
+  }
+
+  @media (orientation: portrait) {
+    &--placed:nth-child(1) {
+      transform: translate(-11rem, -8rem);
+    }
+    &--placed:nth-child(2) {
+      transform: translate(0, -8rem);
+    }
+    &--placed:nth-child(3) {
+      transform: translate(11rem, -8rem);
+    }
+    &--placed:nth-child(4) {
+      transform: translate(-5.5rem, 8rem);
+    }
+    &--placed:nth-child(5) {
+      transform: translate(5.5rem, 8rem);
+    }
   }
 }
