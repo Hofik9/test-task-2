@@ -1,0 +1,8 @@
+{
+  "name": "task-2",
+  "version": "1.0.0",
+  "main": "index.html",
+  "repository": "git@github.com:Hofik9/test-task-2.git",
+  "author": "Jan Hoffman <honza.hoffman@gmail.com>",
+  "license": "MIT"
+}

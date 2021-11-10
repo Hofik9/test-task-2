@@ -23,12 +23,17 @@ class CardStack {
   }
 }
 
+interface Window {
+  Swiper: any
+}
+
 class Card {
   private cardStack: CardStack
   private randomSeed = [0, 0, 0]
   private transform = { x: 0, y: 0, rotation: 0 }
   private isRotated = false
   private element: HTMLDivElement
+  private lastTouchStart = 0
 
   constructor(cardElement: HTMLDivElement, stack: CardStack) {
     this.element = cardElement
@@ -39,7 +44,21 @@ class Card {
       (Math.random() > 0.5 ? -1 : 1) * Math.random() * 12, // random rotation
     ]
 
-    this.element.addEventListener('click', this.handleClick)
+    new window.Swiper('.swiper', {
+      direction: 'vertical',
+      slidesPerView: 'auto',
+      freeMode: true,
+      scrollbar: {
+        el: '.swiper-scrollbar',
+        hide: true,
+      },
+      mousewheel: true,
+    })
+
+    this.element.addEventListener('pointerdown', (evt) => {
+      this.lastTouchStart = evt.clientY
+    })
+    this.element.addEventListener('pointerup', this.handleClick)
     this.returnToStack()
   }
 
@@ -50,7 +69,12 @@ class Card {
     })`
   }
 
-  handleClick = () => {
+  handleClick = (evt: PointerEvent) => {
+    // Prevent a card from rotation if dragging was detected
+    if (Math.abs(evt.clientY - this.lastTouchStart) > 20) {
+      return
+    }
+
     if (!this.cardStack.isExpanded) {
       this.cardStack.expand()
     } else {

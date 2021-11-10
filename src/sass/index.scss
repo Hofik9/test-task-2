@@ -25,7 +25,7 @@ body {
   font-size: 0.6rem;
   perspective: 50rem;
   perspective-origin: 50% 75%;
-  transform-style: preserve-3d;
+  overflow: hidden;
   background: url('../../img/bg-landscape.jpg') center center/cover no-repeat;
 
   @media (orientation: portrait) {
@@ -152,14 +152,29 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    bottom: 0;
-    right: 0;
-    padding: 0 1em;
-    margin: var(--card-border-radius) 0;
-    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    // bottom: 0;
+    // right: 0;
+    // padding: 0 1em;
+    // margin: var(--card-border-radius) 0;
+    // overflow-y: auto;
+    mask-image: linear-gradient(
+      to top,
+      transparent,
+      black 10%,
+      black 90%,
+      transparent
+    );
 
-    > :first-child {
-      margin-top: 0;
+    .swiper-slide {
+      height: auto;
+      padding: 1.4em 1em;
+      box-sizing: border-box;
+
+      > :first-child {
+        margin-top: 0;
+      }
     }
 
     img {
